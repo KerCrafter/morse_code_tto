@@ -22,6 +22,6 @@ module tt_um_morse (
 
     morse_top morse(.clk(clk),.rst(rst_n),.dot_inp(ui_in[0]),.dash_inp(ui_in[1]),.char_space_inp(ui_in[2]),.word_space_inp(ui_in[3]),.anode(uio_out[3:0]),.sout(uo_out));
   // List all unused inputs to prevent warnings
-    wire _unused = &{ena,clk,rst_n,uio_in,1'b0};
+    wire _unused = &{ena,clk,rst_n,uio_in,ui_in[7:4],1'b0};
 
 endmodule
