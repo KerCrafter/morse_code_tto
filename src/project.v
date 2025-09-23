@@ -5,7 +5,7 @@
 
 `default_nettype none
 
-module tt_um_example (
+module tt_um_morse (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
@@ -17,11 +17,12 @@ module tt_um_example (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
+    assign uio_out[7:4]  = 'd0;  // Example: ou_out is the sum of ui_in and uio_in
+  assign uio_in = 0;
   assign uio_oe  = 0;
 
+    morse_top morse(.clk(clk),.rst(rst_n),.dot_inp(ui_in[0]),.dash_inp(ui_in[1]),.char_space_inp(ui_in[2]),.word_space_inp(ui_in[3]),.anode(uio_out[3:0]),.sout(uo_out));
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+    wire _unused = &{ena,clk,rst_n,1'b0};
 
 endmodule
