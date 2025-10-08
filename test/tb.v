@@ -1,6 +1,9 @@
 `default_nettype none
 `timescale 1ns / 1ps
-
+`include "project.v"
+`include "morse_top.v"
+`include "trans_fsm.v"
+`include "rec_fsm.v"
 /* This testbench just instantiates the module and makes some convenient wires
    that can be driven / tested by the cocotb test.py.
 */
@@ -28,7 +31,7 @@ module tb ();
 `endif
 
   // Replace tt_um_example with your module name:
-  tt_um_example user_project (
+  tt_um_morse (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
