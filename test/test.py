@@ -7,29 +7,25 @@ from cocotb.triggers import ClockCycles
 
 
 @cocotb.test()
-async def morse_code_single_char_test(dut):
-    """Test Morse code transmitter for single character: dot dot dot + char_space (active-low reset)"""
+async def test_project(dut):
+    dut._log.info("Start")
 
-    dut._log.info("Starting single character Morse code test with active-low reset")
-
-    # Start clock (10 ns period)
-    clock = Clock(dut.clk, 10, units="ns")
+    # Set the clock period to 10 us (100 KHz)
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
 
-    # Apply active-low reset
-    dut.rst_n.value = 0   # Assert reset (active-low)
-    dut.dot_inp.value = 0
-    dut.dash_inp.value = 0
-    dut.char_space_inp.value = 0
-    dut.word_space_inp.value = 0
-    await ClockCycles(dut.clk, 5)
+    # Reset
+    dut._log.info("Reset")
+    dut.ena.value = 1
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 10)
+    dut.rst_n.value = 1
 
-    dut.rst_n.value = 1   # Deassert reset
-    await ClockCycles(dut.clk, 5)
-    dut._log.info("Reset deasserted (rst_n=1)")
+    dut._log.info("Test project behavior")
 
-    # Helper: 1 cycle high, 1 cycle low
-    async def single_cycle_pulse(signal):
+        async def single_cycle_pulse(signal):
         signal.value = 1
         await ClockCycles(dut.clk, 1)
         signal.value = 0
@@ -39,19 +35,20 @@ async def morse_code_single_char_test(dut):
     # -------------------------
     # Input sequence: dot dot dot + char_space
     # -------------------------
-    await single_cycle_pulse(dut.dot_inp)
-    await single_cycle_pulse(dut.dot_inp)
-    await single_cycle_pulse(dut.dot_inp)
-    await single_cycle_pulse(dut.char_space_inp)
+    await single_cycle_pulse(dut.ui_in[0])
+    await single_cycle_pulse(dut.ui_in[0])
+    await single_cycle_pulse(dut.ui_in[0])
+    await single_cycle_pulse(dut.ui_in[2])
 
-    # Allow FSM to settle and update sout
-    await ClockCycles(dut.clk, 5)
 
-    # Check sout value
-    sout_val = dut.sout.value.integer
-    dut._log.info(f"sout observed value = 0x{sout_val:02X}")
 
-    expected_val = 0x92
-    assert sout_val == expected_val, f"Expected sout=0x{expected_val:02X}, got 0x{sout_val:02X}"
+    # Wait for one clock cycle to see the output values
+    await ClockCycles(dut.clk, 1)
 
-    dut._log.info("Single character Morse code test passed")
+
+    # The following assersion is just an example of how to check the output values.
+    # Change it to match the actual expected output of your module:
+    assert dut.uo_out.value == 0x92
+
+    # Keep testing the module by changing the input values, waiting for
+    # one or more clock cycles, and asserting the expected output values.
