@@ -23,32 +23,25 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    #dut._log.info("Test project behavior")
 
-        async def single_cycle_pulse(signal):
-        signal.value = 1
-        await ClockCycles(dut.clk, 1)
-        signal.value = 0
-        await ClockCycles(dut.clk, 1)
-        dut._log.info(f"Pulsed {signal._name} for 1 cycle")
-
-    # -------------------------
-    # Input sequence: dot dot dot + char_space
-    # -------------------------
-    await single_cycle_pulse(dut.ui_in[0])
-    await single_cycle_pulse(dut.ui_in[0])
-    await single_cycle_pulse(dut.ui_in[0])
-    await single_cycle_pulse(dut.ui_in[2])
-
-
+    dut.ui_in.value = 0b00000001  # dot high
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0b00000000  # dot low
+    await ClockCycles(dut.clk, 1)
+    
+    dut.ui_in.value = 0b00000100  # char_space high
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0b00000000  # char_space low
+    await ClockCycles(dut.clk, 1)
 
     # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    #await ClockCycles(dut.clk, 1)
 
 
     # The following assersion is just an example of how to check the output values.
     # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 0x92
+    assert dut.uo_out.value == 0x86
 
     # Keep testing the module by changing the input values, waiting for
     # one or more clock cycles, and asserting the expected output values.
