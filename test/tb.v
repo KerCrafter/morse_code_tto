@@ -1,6 +1,6 @@
 `default_nettype none
 `timescale 1ns / 1ps
-`include "project.v"
+//`include "project.v"
 `include "morse_top.v"
 `include "trans_fsm.v"
 `include "rec_fsm.v"
