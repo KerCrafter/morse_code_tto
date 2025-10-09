@@ -20,23 +20,23 @@ async def test_project(dut):
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
+    await ClockCycles(dut.clk, 3)
     dut.rst_n.value = 1
 
     #dut._log.info("Test project behavior")
-
+    await ClockCycles(dut.clk, 3)
     dut.ui_in.value = 0b00000001  # dot high
     await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 0b00000000  # dot low
-    await ClockCycles(dut.clk, 3)
+    await ClockCycles(dut.clk, 1)
     
     dut.ui_in.value = 0b00000100  # char_space high
     await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 0b00000000  # char_space low
-    await ClockCycles(dut.clk, 3)
+    await ClockCycles(dut.clk, 0)
 
     # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    #await ClockCycles(dut.clk, 1)
 
 
     # The following assersion is just an example of how to check the output values.
