@@ -19,6 +19,8 @@ async def test_project(dut):
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 3)
     dut.rst_n.value = 1
@@ -31,7 +33,7 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 1)
     
     dut.ui_in.value = 0b00000100  # char_space high
-    await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 0)
     dut.ui_in.value = 0b00000000  # char_space low
     await ClockCycles(dut.clk, 0)
 
