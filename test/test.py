@@ -11,7 +11,7 @@ async def test_project(dut):
     dut._log.info("Start")
 
     # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 20, units="ns")
+    clock = Clock(dut.clk, 10, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -27,7 +27,7 @@ async def test_project(dut):
 
     #dut._log.info("Test project behavior")
     await ClockCycles(dut.clk, 3)
-    dut.ui_in.value = 0b00000010  # dot high
+    dut.ui_in.value = 0b00000001  # dot high
     await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 0b00000000  # dot low
     await ClockCycles(dut.clk, 1)
@@ -43,7 +43,7 @@ async def test_project(dut):
 
     # The following assersion is just an example of how to check the output values.
     # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 0x87
+    assert dut.uo_out.value == 0x86
 
     # Keep testing the module by changing the input values, waiting for
     # one or more clock cycles, and asserting the expected output values.
