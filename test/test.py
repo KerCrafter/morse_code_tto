@@ -27,7 +27,7 @@ async def test_project(dut):
 
     #dut._log.info("Test project behavior")
     await ClockCycles(dut.clk, 3)
-    dut.ui_in.value = 0b00000001  # dot high
+    dut.ui_in.value = 0b00000010  # dot high
     await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 0b00000000  # dot low
     await ClockCycles(dut.clk, 1)
