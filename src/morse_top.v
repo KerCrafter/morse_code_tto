@@ -9,7 +9,7 @@ output [3:0] anode,
 output reg [7:0]sout);
 
 
-wire [1:0] trans_out;
+wire [2:0] trans_out;
 wire [7:0] serial_out;
 
 
