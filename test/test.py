@@ -1,56 +1,75 @@
+# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
+# SPDX-License-Identifier: Apache-2.0
+
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+from cocotb.triggers import RisingEdge, ClockCycles
 
+# --- Configuration ---
+# Input Masks (mapped to ui_in[3:0])
+DOT_MASK = 0x01         # ui_in[0]
+CHAR_SPACE_MASK = 0x04  # ui_in[2]
 
+# Output Codes (from rec_fsm.v)
+CODE_E = 0x86           # The output code for 'e'
+CODE_NO_OUTPUT = 0xFF   # Default output when decoding is in progress or FSM is reset
+
+# --- Helper Function ---
+
+async def send_pulse(dut, mask):
+    """
+    Sets the input 'ui_in' high based on the mask for exactly one clock cycle,
+    then sets it back to zero.
+    """
+    dut.ui_in.value = mask
+    await RisingEdge(dut.clk)
+    dut.ui_in.value = 0
+    await RisingEdge(dut.clk) # Wait one extra cycle
+    
 @cocotb.test()
-async def test_letter_E(dut):
-    """Test case for Morse letter 'E' (dot followed by char space)."""
-    dut._log.info("=== Testing letter E ===")
+async def test_decode_e(dut):
+    dut._log.info("Starting Morse Decoder Test for 'E'")
 
-    # --- Clock setup ---
-    clock = Clock(dut.clk, 10, units="us")  # 10us period = 100kHz
+    # Set the clock period
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
 
-    # --- Initial setup ---
+    # Apply Reset
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-
-    dut._log.info("Applying reset (active low)")
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
-    dut._log.info("Reset released")
-    await ClockCycles(dut.clk, 10)
+    await RisingEdge(dut.clk)
+    dut._log.info("Reset complete.")
 
-    # --- Step 1: Send DOT (ui_in[0]) ---
-    dut._log.info("Applying DOT input (ui_in[0])")
-    dut.ui_in.value = 0b00000001  # dot_inp = 1
-    await ClockCycles(dut.clk, 3)
-    dut.ui_in.value = 0
-    await ClockCycles(dut.clk, 5)
+    # Wait one cycle for the receiver FSM to settle into 0xFF
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output should be {hex(CODE_NO_OUTPUT)} after reset."
 
-    # --- Step 2: Send CHAR SPACE (ui_in[2]) ---
-    dut._log.info("Applying CHAR SPACE input (ui_in[2])")
-    dut.ui_in.value = 0b00000100  # char_space_inp = 1
-    await ClockCycles(dut.clk, 5)
-    dut.ui_in.value = 0
-    await ClockCycles(dut.clk, 10)
+    # --- TEST: Decode 'E' (.) ---
+    dut._log.info("--- Test: Decoding 'E' (.) ---")
 
-    # --- Step 3: Observe outputs ---
-    observed = int(dut.uo_out.value)
-    dut._log.info(f"Observed uo_out = 0x{observed:02X}")
+    # 1. Send DOT pulse (moves rec_fsm to state 'e')
+    await send_pulse(dut, DOT_MASK)
+    # At this point, rec_fsm is in state 'e' (8'h04), uo_out remains 0xFF.
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
 
-    # Debug: print key signals for traceability
-    dot_inp = int(dut.ui_in.value & 1)
-    dash_inp = (int(dut.ui_in.value) >> 1) & 1
-    char_space_inp = (int(dut.ui_in.value) >> 2) & 1
-    rst_n = int(dut.rst_n.value)
-    ena = int(dut.ena.value)
+    # 2. Send Character Space pulse (triggers the output)
+    # The trans_fsm takes CHAR_SPACE_MASK high for 1 cycle and then
+    # internally sequences 3 cycles of 3'b011 to rec_fsm.
+    await send_pulse(dut, CHAR_SPACE_MASK)
 
-    dut._log.info(f"DEBUG: dot_inp={dot_inp} dash_inp={dash_inp} "
-                  f"char_space_inp={char_space_inp} rst_n={rst_n} ena={ena}")
+    # Cycle 2: The output is registered. uo_out should be 0x86.
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.integer)}"
 
-    expected = 0x86  # for letter E
-    assert observed == expected, f"Expected 0x{expected:02X}, got 0x{observed:02X}"
+    # Cycle 3: The FSM resets the output.
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output should return to {hex(CODE_NO_OUTPUT)}."
+
+    # Wait for the last cycle of the char space sequence
+    await ClockCycles(dut.clk, 1)
+    
+    dut._log.info("Test for 'E' successfully passed.")
