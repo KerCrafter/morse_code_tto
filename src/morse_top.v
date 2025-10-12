@@ -5,7 +5,6 @@ input wire dot_inp,
 input wire dash_inp, 
 input wire char_space_inp, 
 input wire word_space_inp,
-output [3:0] anode,
 output reg [7:0]sout);
 
 
@@ -21,6 +20,4 @@ trans_fsm trans (.clk(clk),.rst(rst),.dot_inp(dot_inp),.dash_inp(dash_inp),.char
 always @(*) begin
 sout = serial_out;
 end
-assign anode = 4'b0000;
-
 endmodule
