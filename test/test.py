@@ -32,11 +32,11 @@ async def test_letter_E(dut):
 
     # Step 2: Apply character space pulse
     dut.ui_in.value = 0b00000100  # char_space_inp=1
-    await ClockCycles(dut.clk, 3)  # allow 3 cycles as per FSM
+    await ClockCycles(dut.clk, 1)  # allow 3 cycles as per FSM
     dut.ui_in.value = 0
 
     # Step 3: Wait a few cycles for output to settle
-    await ClockCycles(dut.clk, 3)
+    await ClockCycles(dut.clk, 0)
 
     # Check output
     observed = int(dut.uo_out.value)
