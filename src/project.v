@@ -17,8 +17,8 @@ module tt_um_morse (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-    assign uio_out[7:4]  = 'd0;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_oe  = 0;
+    //assign uio_out[7:4]  = 'd0;  // Example: ou_out is the sum of ui_in and uio_in
+  //assign uio_oe  = 0;
 
     morse_top morse(.clk(clk),.rst(rst_n),.dot_inp(ui_in[0]),.dash_inp(ui_in[1]),.char_space_inp(ui_in[2]),.word_space_inp(ui_in[3]),.anode(uio_out[3:0]),.sout(uo_out));
   // List all unused inputs to prevent warnings
