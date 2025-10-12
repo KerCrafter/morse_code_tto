@@ -31,7 +31,7 @@ async def test_decode_e(dut):
     dut._log.info("Starting Morse Decoder Test for 'E'")
 
     # Set the clock period
-    clock = Clock(dut.clk, 10, unit="us")
+    clock = Clock(dut.clk, 10, units ="us")
     cocotb.start_soon(clock.start())
 
     # Apply Reset
