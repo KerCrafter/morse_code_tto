@@ -11,7 +11,7 @@ DOT_MASK = 0x01         # ui_in[0]
 CHAR_SPACE_MASK = 0x04  # ui_in[2]
 
 # Output Codes (from rec_fsm.v)
-CODE_E = 0x86           # The output code for 'e'
+CODE_E = 0x65           # The output code for 'e'
 CODE_NO_OUTPUT = 0xFF   # Default output when decoding is in progress or FSM is reset
 
 # --- Helper Function ---
