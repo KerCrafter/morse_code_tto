@@ -235,8 +235,8 @@ always @(*) begin
         o:
         case (p_in)
             3'b000: begin next_state = state; s_out = 8'hff; end
-            3'b001: begin next_state = ds1; s_out = 8'hff; end
-            3'b010: begin next_state = reset_state; s_out = 8'hff; end
+            3'b001: begin next_state = ds2; s_out = 8'hff; end
+            3'b010: begin next_state = ds1; s_out = 8'hff; end
             3'b011: begin next_state = reset_state; s_out = 8'h6F; end
             3'b100: begin next_state = reset_state; s_out = 8'h20; end // Changed from f3 to f7
             default: begin next_state = reset_state; s_out = 8'hff; end
@@ -477,8 +477,8 @@ always @(*) begin
         ds1:
         case (p_in)
             3'b000: begin next_state = state; s_out = 8'hff; end
-            3'b001: begin next_state = eight; s_out = 8'hff; end
-            3'b010: begin next_state = reset_state; s_out = 8'hff; end
+            3'b001: begin next_state = nine; s_out = 8'hff; end
+            3'b010: begin next_state = zero; s_out = 8'hff; end
             3'b011: begin next_state = reset_state; s_out = 8'hff; end
             3'b100: begin next_state = reset_state; s_out = 8'hff; end // Changed from f3 to f7
             default: begin next_state = reset_state; s_out = 8'hff; end
@@ -488,8 +488,8 @@ always @(*) begin
         ds2:
         case (p_in)
             3'b000: begin next_state = state; s_out = 8'hff; end
-            3'b001: begin next_state = nine; s_out = 8'hff; end
-            3'b010: begin next_state = zero; s_out = 8'hff; end
+            3'b001: begin next_state = eight; s_out = 8'hff; end
+            3'b010: begin next_state = reset_state; s_out = 8'hff; end
             3'b011: begin next_state = reset_state; s_out = 8'hff; end
             3'b100: begin next_state = reset_state; s_out = 8'hff; end // Changed from f3 to f7
             default: begin next_state = reset_state; s_out = 8'hff; end
