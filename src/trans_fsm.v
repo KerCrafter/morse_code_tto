@@ -70,17 +70,17 @@ begin
         s_dash: begin parallel_out = 3'b010; next_state = s_idle; end
 
         // --- Character Space Sequence (3 cycles) ---
-        s_char_1: begin parallel_out = 3'b011; next_state = s_char_2; end
-        s_char_2: begin parallel_out = 3'b011; next_state = s_char_3; end
+        s_char_1: begin parallel_out = 3'b000; next_state = s_char_2; end
+        s_char_2: begin parallel_out = 3'b000; next_state = s_char_3; end
         s_char_3: begin parallel_out = 3'b011; next_state = s_idle;   end
 
         // --- Word Space Sequence (7 cycles) ---
-        s_word_1: begin parallel_out = 3'b100; next_state = s_word_2; end
-        s_word_2: begin parallel_out = 3'b100; next_state = s_word_3; end
-        s_word_3: begin parallel_out = 3'b100; next_state = s_word_4; end
-        s_word_4: begin parallel_out = 3'b100; next_state = s_word_5; end
-        s_word_5: begin parallel_out = 3'b100; next_state = s_word_6; end
-        s_word_6: begin parallel_out = 3'b100; next_state = s_word_7; end
+        s_word_1: begin parallel_out = 3'b000; next_state = s_word_2; end
+        s_word_2: begin parallel_out = 3'b000; next_state = s_word_3; end
+        s_word_3: begin parallel_out = 3'b000; next_state = s_word_4; end
+        s_word_4: begin parallel_out = 3'b000; next_state = s_word_5; end
+        s_word_5: begin parallel_out = 3'b000; next_state = s_word_6; end
+        s_word_6: begin parallel_out = 3'b000; next_state = s_word_7; end
         s_word_7: begin parallel_out = 3'b100; next_state = s_idle;   end
         
         default:
