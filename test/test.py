@@ -30,8 +30,8 @@ async def send_pulse(dut, signal):
 async def test_decode_e(dut):
     dut._log.info("Starting Morse Decoder Test for 'E' using new dedicated input signals (dot_inp, char_space_inp).")
 
-    # Set the clock period. Using compatible string format to fix TypeError.
-    clock = Clock(dut.clk, "10us")
+    # Set the clock period. Using (value, units) positional arguments for compatibility.
+    clock = Clock(dut.clk, 10, "us")
     cocotb.start_soon(clock.start())
 
     # --- Initialize Inputs ---
