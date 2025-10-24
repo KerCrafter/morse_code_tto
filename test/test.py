@@ -67,7 +67,7 @@ async def test_decode_e(dut):
     await send_pulse(dut, CHAR_SPACE_MASK)
 
     # Wait one cycle after the CHAR_SPACE pulse finishes.
-    await ClockCycles(dut.clk, 3) 
+    await ClockCycles(dut.clk, 4) 
     
     # Cycle 1 (after char space pulse ends): The output should register the decoded value.
     assert dut.uo_out.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.integer)}"
