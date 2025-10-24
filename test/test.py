@@ -6,84 +6,77 @@ from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 
 # --- Configuration ---
-# NOTE: Input masks (DOT_MASK, CHAR_SPACE_MASK) are no longer used as the design
-# now uses dedicated signals (dot_inp, char_space_inp, etc.).
-CODE_E = 0x65           # The output code for 'e'
+# Input Masks (mapped to ui_in[7:0] for morse_top instance inside tt_um_morse)
+DOT_MASK = 0x01         # ui_in[0] -> dot_inp
+CHAR_SPACE_MASK = 0x04  # ui_in[2] -> char_space_inp
+DASH_MASK = 0x02        # ui_in[1] -> dash_inp (Not used in this test)
+
+# Output Codes (assuming the output code for 'e' is 0x65 from previous context)
+CODE_E = 0x65           # The expected output code for 'e'
 CODE_NO_OUTPUT = 0xFF   # Default output when decoding is in progress or FSM is reset
 
-# --- Helper Function (Updated for dedicated input signals) ---
+# --- Helper Function ---
 
-async def send_pulse(dut, signal):
+async def send_pulse(dut, mask):
     """
-    Sets the given input signal (e.g., dut.dot_inp) high for exactly one clock cycle,
+    Sets the input 'ui_in' high based on the mask for exactly one clock cycle,
     then sets it back to zero.
     """
-    # 1. Set signal high on the rising edge of the clock
-    signal.value = 1
+    dut.ui_in.value = mask
     await RisingEdge(dut.clk)
-    
-    # 2. Set signal low on the next rising edge of the clock
-    signal.value = 0
+    dut.ui_in.value = 0
     await RisingEdge(dut.clk) # Wait one extra cycle to ensure timing stability
     
 @cocotb.test()
 async def test_decode_e(dut):
-    dut._log.info("Starting Morse Decoder Test for 'E' using new dedicated input signals (dot_inp, char_space_inp).")
+    dut._log.info("Starting Morse Decoder Test for 'E' using ui_in masks.")
 
-    # Set the clock period. Using (value, units) positional arguments for compatibility.
+    # Set the clock period (using positional arguments for maximum compatibility)
     clock = Clock(dut.clk, 10, "us")
     cocotb.start_soon(clock.start())
 
     # --- Initialize Inputs ---
     dut.ena.value = 1
-    # Initialize all new dedicated input signals to 0
-    dut.dot_inp.value = 0
-    dut.dash_inp.value = 0
-    dut.char_space_inp.value = 0
-    dut.word_space_inp.value = 0
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
     
-    # The original inputs (ui_in, uio_in) are likely unused now but setting them just in case
-    # If your top module doesn't have these ports, you may need to comment these lines out.
-    # dut.ui_in.value = 0
-    # dut.uio_in.value = 0
-
-    # --- Apply Reset (Now using active-HIGH 'rst') ---
-    dut.rst.value = 1 # Active High Reset
+    # --- Apply Reset (Active-LOW 'rst_n') ---
+    dut.rst_n.value = 0 # Active Low Reset
     await ClockCycles(dut.clk, 10)
-    dut.rst.value = 0 # End Reset
+    dut.rst_n.value = 1 # End Reset
     await RisingEdge(dut.clk)
-    dut._log.info("Reset complete (rst transitioned 1 -> 0).")
+    dut._log.info("Reset complete (rst_n transitioned 0 -> 1).")
 
     # Wait one cycle for the receiver FSM to settle into 0xFF
     await ClockCycles(dut.clk, 1)
-    # Check new output signal name 'sout'
-    assert dut.sout.value.integer == CODE_NO_OUTPUT, f"Output sout should be {hex(CODE_NO_OUTPUT)} after reset."
+    # Check the standard output signal name 'uo_out'
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output uo_out should be {hex(CODE_NO_OUTPUT)} after reset."
 
     # --- TEST: Decode 'E' (.) ---
     dut._log.info("--- Test: Decoding 'E' (.) ---")
 
-    # 1. Send DOT pulse on the dedicated dot_inp wire
-    dut._log.info("Sending DOT pulse on dot_inp...")
-    await send_pulse(dut, dut.dot_inp)
+    # 1. Send DOT pulse (ui_in[0] = 1)
+    dut._log.info("Sending DOT pulse (mask 0x01) on ui_in...")
+    await send_pulse(dut, DOT_MASK)
     
     # Check intermediate state: output should still be 0xFF after the dot pulse.
-    assert dut.sout.value.integer == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
 
-    # 2. Send Character Space pulse on the dedicated char_space_inp wire (triggers the output)
-    dut._log.info("Sending CHAR_SPACE pulse on char_space_inp to complete the character...")
-    await send_pulse(dut, dut.char_space_inp)
+    # 2. Send Character Space pulse (ui_in[2] = 1)
+    dut._log.info("Sending CHAR_SPACE pulse (mask 0x04) on ui_in to complete the character...")
+    await send_pulse(dut, CHAR_SPACE_MASK)
 
     # Wait one cycle after the CHAR_SPACE pulse finishes.
-    await ClockCycles(dut.clk, 1) 
+    await ClockCycles(dut.clk, 3) 
     
     # Cycle 1 (after char space pulse ends): The output should register the decoded value.
-    assert dut.sout.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.sout.value.integer)}"
+    assert dut.uo_out.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.integer)}"
 
     # Cycle 2: The output should return to 0xFF.
     await ClockCycles(dut.clk, 1)
-    assert dut.sout.value.integer == CODE_NO_OUTPUT, f"Output should return to {hex(CODE_NO_OUTPUT)}."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output should return to {hex(CODE_NO_OUTPUT)}."
 
     # Wait for FSM to completely settle
     await ClockCycles(dut.clk, 1)
     
-    dut._log.info("Test for 'E' successfully passed using new design inputs.")
+    dut._log.info("Test for 'E' successfully passed using ui_in/uo_out interface.")
