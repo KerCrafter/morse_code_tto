@@ -64,15 +64,16 @@ async def test_decode_e(dut):
 
     # 2. Send Character Space pulse (ui_in[2] = 1)
     dut._log.info("Sending CHAR_SPACE pulse (mask 0x04) on ui_in to complete the character...")
-    await send_pulse(dut, CHAR_SPACE_MASK)
+    await send_pulse(dut, CHAR_SPACE_MASK) # Consumes 2 cycles
 
-    # Wait one cycle after the CHAR_SPACE pulse finishes.
-    await ClockCycles(dut.clk, 1) 
+    # --- ADJUSTED WAIT TIME ---
+    # Wait TWO cycles after the CHAR_SPACE pulse finishes (checking on the 4th cycle total).
+    await ClockCycles(dut.clk, 2) 
     
-    # Cycle 1 (after char space pulse ends): The output should register the decoded value.
+    # Cycle 1 (Valid Output): The output should register the decoded value.
     assert dut.uo_out.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.integer)}"
 
-    # Cycle 2: The output should return to 0xFF.
+    # Cycle 2 (Reset): The output should return to 0xFF.
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output should return to {hex(CODE_NO_OUTPUT)}."
 
