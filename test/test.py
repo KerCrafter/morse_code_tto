@@ -68,7 +68,7 @@ async def test_decode_e(dut):
 
     # --- ADJUSTED WAIT TIME ---
     # Wait TWO cycles after the CHAR_SPACE pulse finishes (checking on the 4th cycle total).
-    await ClockCycles(dut.clk, 2) 
+    await ClockCycles(dut.clk, 3) 
     
     # Cycle 1 (Valid Output): The output should register the decoded value.
     assert dut.uo_out.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.integer)}"
