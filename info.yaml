@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        "Morse Code Converter"      # Project title
+  title:        "Morse Code Detector"      # Project title
   author:       "Yagnadatt Sarangi"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "The Morse Code Converter project translates Morse code sequences of dots and dashes into English alphabets (A–Z) and digits (0–9)."      # One line description of what your project does
