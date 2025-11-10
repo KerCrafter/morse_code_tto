@@ -43,7 +43,7 @@ async def init(dut):
     # Wait one cycle for the receiver FSM to settle into 0xFF
     await ClockCycles(dut.clk, 1)
     # Check the standard output signal name 'uo_out'
-    assert dut.uo_out.value.to_unsigned() == CODE_NO_OUTPUT, f"Output uo_out should be {hex(CODE_NO_OUTPUT)} after reset."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output uo_out should be {hex(CODE_NO_OUTPUT)} after reset."
 
 
 async def send_pulse(dut, mask):
@@ -114,33 +114,33 @@ async def tx_MA(dut):
 
 async def a_SPACE(dut):
     await dut.uo_out.value_change
-    assert dut.uo_out.value.to_unsigned() == CODE_SPACE, f"Failed to decode 'SPACE'. Expected {hex(CODE_SPACE)}, Got {hex(dut.uo_out.value.to_unsigned())}"
+    assert dut.uo_out.value.integer == CODE_SPACE, f"Failed to decode 'SPACE'. Expected {hex(CODE_SPACE)}, Got {hex(dut.uo_out.value.integer)}"
 
 
 async def a_NOP(dut):
     await dut.uo_out.value_change
     
-    assert dut.uo_out.value.to_unsigned() == CODE_NO_OUTPUT, f"Output uo_out should be {hex(CODE_NO_OUTPUT)} after reset."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output uo_out should be {hex(CODE_NO_OUTPUT)} after reset."
     
 async def a_T(dut):
     await dut.uo_out.value_change
     
-    assert dut.uo_out.value.to_unsigned() == CODE_T, f"Failed to decode 'T'. Expected {hex(CODE_T)}, Got {hex(dut.uo_out.value.to_unsigned())}"
+    assert dut.uo_out.value.integer == CODE_T, f"Failed to decode 'T'. Expected {hex(CODE_T)}, Got {hex(dut.uo_out.value.integer)}"
 
 async def a_M(dut):
     await dut.uo_out.value_change
     
-    assert dut.uo_out.value.to_unsigned() == CODE_M, f"Failed to decode 'M'. Expected {hex(CODE_M)}, Got {hex(dut.uo_out.value.to_unsigned())}"
+    assert dut.uo_out.value.integer == CODE_M, f"Failed to decode 'M'. Expected {hex(CODE_M)}, Got {hex(dut.uo_out.value.integer)}"
 
 async def a_E(dut):
     await dut.uo_out.value_change
 
-    assert dut.uo_out.value.to_unsigned() == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.to_unsigned())}"
+    assert dut.uo_out.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.integer)}"
 
 async def a_A(dut):
     await dut.uo_out.value_change
 
-    assert dut.uo_out.value.to_unsigned() == CODE_A, f"Failed to decode 'A'. Expected {hex(CODE_A)}, Got {hex(dut.uo_out.value.to_unsigned())}"
+    assert dut.uo_out.value.integer == CODE_A, f"Failed to decode 'A'. Expected {hex(CODE_A)}, Got {hex(dut.uo_out.value.integer)}"
 
 @cocotb.test()
 async def test_decode_e(dut):
@@ -151,7 +151,7 @@ async def test_decode_e(dut):
 
     await send_pulse(dut, DOT_MASK)
     
-    assert dut.uo_out.value.to_unsigned() == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
 
     dut._log.info("Sending CHAR_SPACE pulse (mask 0x04) on ui_in to complete the character...")
     await send_pulse(dut, CHAR_SPACE_MASK) # Consumes 2 cycles
@@ -177,7 +177,7 @@ async def test_decode_a(dut):
     await send_pulse(dut, DASH_MASK)
     
     # Check intermediate state: output should still be 0xFF after the dot pulse.
-    assert dut.uo_out.value.to_unsigned() == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
 
     # 2. Send Character Space pulse (ui_in[2] = 1)
     dut._log.info("Sending CHAR_SPACE pulse (mask 0x04) on ui_in to complete the character...")
@@ -201,7 +201,7 @@ async def test_decode_space(dut):
     await send_pulse(dut, WORD_SPACE_MASK)
     
     # Check intermediate state: output should still be 0xFF after the space pulse.
-    assert dut.uo_out.value.to_unsigned() == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
 
 
     await a_SPACE(dut)
@@ -209,7 +209,7 @@ async def test_decode_space(dut):
 
     # Cycle 2 (Reset): The output should return to 0xFF.
     await dut.uo_out.value_change
-    assert dut.uo_out.value.to_unsigned() == CODE_NO_OUTPUT, f"Output should return to {hex(CODE_NO_OUTPUT)}."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output should return to {hex(CODE_NO_OUTPUT)}."
 
     dut._log.info("Test for 'SPACE' successfully passed using ui_in/uo_out interface.")
 
@@ -225,7 +225,7 @@ async def test_decode_T_space_T(dut):
     cocotb.start_soon(send_T_space_T_manually(dut))
     
     # Check intermediate state: output should still be 0xFF after the space pulse.
-    assert dut.uo_out.value.to_unsigned() == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
+    assert dut.uo_out.value.integer == CODE_NO_OUTPUT, "Output should still be 0xFF after the dot pulse."
 
 
     await a_T(dut)
