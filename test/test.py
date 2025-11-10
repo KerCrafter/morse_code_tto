@@ -3,7 +3,7 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, ClockCycles, ValueChange
+from cocotb.triggers import RisingEdge, ClockCycles
 
 # --- Configuration ---
 # Input Masks (mapped to ui_in[7:0] for morse_top instance inside tt_um_morse)
