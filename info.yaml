@@ -27,8 +27,6 @@ project:
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-
-    morse_top morse(.clk(clk),.rst(rst_n),.dot_inp(ui_in[0]),.dash_inp(ui_in[1]),.char_space_inp(ui_in[2]),.word_space_inp(ui_in[3]),.rx_cw(ui_in[7]),.sout(uo_out));
   ui[0]: "DOT_INP"
   ui[1]: "DASH_INP"
   ui[2]: "CHAR_SPACE_INP"
