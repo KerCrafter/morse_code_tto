@@ -185,7 +185,7 @@ async def test_decode_a(dut):
     # 1. Send DOT pulse (ui_in[0] = 1)
     dut._log.info("Sending DOT DASH pulse")
     await send_pulse(dut, DOT_MASK)
-    await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 2)
     await send_pulse(dut, DASH_MASK)
     
     # Check intermediate state: output should still be 0xFF after the dot pulse.
@@ -285,7 +285,7 @@ async def test_decode_serial_M(dut):
 
     dut._log.info("Sending DASH DASH")
     await tx_serial_dash(dut)
-    await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 2)
     await tx_serial_dash(dut)
 
     await a_M(dut)

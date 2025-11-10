@@ -69,7 +69,7 @@ begin
         if(!rx_cw) begin
           a_state <= when_down;
 
-          if(up_times <= 4) dot_inp <= 1;
+          if(up_times <= 3) dot_inp <= 1;
           else dash_inp <= 1;
         end
       end
@@ -95,7 +95,7 @@ begin
           //  word_space_inp <= 0;
 
           //  a_state <= send_space;
-          if(down_times > 2) begin
+          if(down_times > 1) begin
             char_space_inp <= 1;
 
             a_state <= when_up;
