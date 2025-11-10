@@ -32,7 +32,7 @@ module tb ();
 `endif
 
   // Replace tt_um_example with your module name:
-  tt_um_morse_with_serial dut(
+  tt_um_morse_w_serial dut(
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
