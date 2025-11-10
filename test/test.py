@@ -114,31 +114,37 @@ async def tx_MA(dut):
 
 async def a_SPACE(dut):
     await dut.uo_out.value_change
+    await dut.clk.value_change
     assert dut.uo_out.value.integer == CODE_SPACE, f"Failed to decode 'SPACE'. Expected {hex(CODE_SPACE)}, Got {hex(dut.uo_out.value.integer)}"
 
 
 async def a_NOP(dut):
     await dut.uo_out.value_change
+    await dut.clk.value_change
     
     assert dut.uo_out.value.integer == CODE_NO_OUTPUT, f"Output uo_out should be {hex(CODE_NO_OUTPUT)} after reset."
     
 async def a_T(dut):
     await dut.uo_out.value_change
+    await dut.clk.value_change
     
     assert dut.uo_out.value.integer == CODE_T, f"Failed to decode 'T'. Expected {hex(CODE_T)}, Got {hex(dut.uo_out.value.integer)}"
 
 async def a_M(dut):
     await dut.uo_out.value_change
+    await dut.clk.value_change
     
     assert dut.uo_out.value.integer == CODE_M, f"Failed to decode 'M'. Expected {hex(CODE_M)}, Got {hex(dut.uo_out.value.integer)}"
 
 async def a_E(dut):
     await dut.uo_out.value_change
+    await dut.clk.value_change
 
     assert dut.uo_out.value.integer == CODE_E, f"Failed to decode 'E'. Expected {hex(CODE_E)}, Got {hex(dut.uo_out.value.integer)}"
 
 async def a_A(dut):
     await dut.uo_out.value_change
+    await dut.clk.value_change
 
     assert dut.uo_out.value.integer == CODE_A, f"Failed to decode 'A'. Expected {hex(CODE_A)}, Got {hex(dut.uo_out.value.integer)}"
 
